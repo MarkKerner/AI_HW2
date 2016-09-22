@@ -15,6 +15,8 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
      * Here you should write your clever algorithms to get the best next move, ie the best
      * next state. This skeleton returns a random move instead.
      */
+	int i;
+
     return lNextStates[rand() % lNextStates.size()];
 }
 
