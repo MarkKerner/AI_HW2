@@ -17,17 +17,19 @@ namespace TICTACTOE
 
 	static int evaluate_gamestate(const GameState& game_state, const int our_player_type)
 	{
+		int win_lose_scalar = 5;
 		if (game_state.isXWin())
 		{
 			if (our_player_type == CELL_X)
-				return 1;
-			else return -1;
+				return win_lose_scalar;
+			else
+				return -win_lose_scalar;
 		}
 		else if (game_state.isOWin())
 		{
 			if (our_player_type == CELL_O)
-				return 1;
-			else return -1;
+				return win_lose_scalar;
+			else return -win_lose_scalar;
 		}
 
 		int x_value = 0;
@@ -118,16 +120,18 @@ namespace TICTACTOE
 		}
 	}
 
-	static const double TIME_BUFFER = 0.3;
+	static const double TIME_BUFFER = 0.1;
 
+	//TODO
 	//how to always return the best value?
+	//evaluate depth?
 	static GameStateEvaluation minimax(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth, int depth, int alpha, int beta)
 	{
 		vector<GameState> possible_next_states;
 		current_state.findPossibleMoves(possible_next_states);
 		int num_next_moves = possible_next_states.size();
 
-		if (num_next_moves == 0 || depth == max_depth || pDue.getSeconds() < TIME_BUFFER)
+		if (num_next_moves == 0 || depth == max_depth || pDue - Deadline::now() < TIME_BUFFER)
 		{
 			return{ current_state, evaluate_gamestate(current_state, our_player_type) };
 		}
@@ -148,7 +152,7 @@ namespace TICTACTOE
 						alpha = best_next_state.value;
 					}
 
-					if (beta <= alpha && pDue.getSeconds() < TIME_BUFFER)
+					if (beta <= alpha &&  pDue - Deadline::now() < TIME_BUFFER)
 						break;
 				}
 				return best_next_state;
@@ -167,7 +171,7 @@ namespace TICTACTOE
 					{
 						beta = next_state_eval.value;
 					}
-					if (beta <= alpha && pDue.getSeconds() < TIME_BUFFER)
+					if (beta <= alpha &&  pDue - Deadline::now() < TIME_BUFFER)
 						break;
 				}
 				return best_next_state;
@@ -188,7 +192,7 @@ namespace TICTACTOE
 		 * Here you should write your clever algorithms to get the best next move, ie the best
 		 * next state. This skeleton returns a random move instead.
 		 */
-		cerr << pDue.getSeconds() << endl;
+
 		GameState best_move = minimax(pDue, pState, pState.getNextPlayer() ^ (CELL_X | CELL_O), 4, 0, -INT_MAX, INT_MAX).state;
 
 		assert(pState.getNextPlayer() != best_move.getNextPlayer());
