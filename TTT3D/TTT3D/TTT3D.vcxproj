@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EF899990-BCE2-49F8-B0F1-EE78B683C4D9}</ProjectGuid>
-    <RootNamespace>TTT</RootNamespace>
+    <ProjectGuid>{8D58F023-43C8-472F-8FC1-600255CC618C}</ProjectGuid>
+    <RootNamespace>TTT3D</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -110,22 +110,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\gamestate.cpp" />
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\minimax.cpp" />
-    <ClCompile Include="..\player.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\constants.hpp" />
     <ClInclude Include="..\deadline.hpp" />
     <ClInclude Include="..\gamestate.hpp" />
     <ClInclude Include="..\minimax.h" />
     <ClInclude Include="..\move.hpp" />
     <ClInclude Include="..\player.hpp" />
-    <ClInclude Include="minimax.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\22-23 September.py" />
+    <ClCompile Include="..\gamestate.cpp" />
+    <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\minimax.cpp" />
+    <ClCompile Include="..\player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\23-24_september.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
