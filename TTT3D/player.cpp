@@ -10,7 +10,7 @@ namespace TICTACTOE3D
 
 	GameState Player::play(const GameState &pState, const Deadline &pDue)
 	{
-		cerr << "play" << endl;
+		cerr << "play:" << (pState.getNextPlayer() != CELL_X ? "PLAYER_X" : "PLAYER_O") << endl;
 		std::vector<GameState> lNextStates;
 		pState.findPossibleMoves(lNextStates);
 
@@ -21,8 +21,9 @@ namespace TICTACTOE3D
 		 * next state. This skeleton returns a random move instead.
 		 */
 		GameState best_move = MiniMax::minimax(pDue, pState, pState.getNextPlayer() ^ (CELL_X | CELL_O), 3);
+
 		assert(pState.getNextPlayer() != best_move.getNextPlayer());
-		cerr << "best_move:" << endl << best_move.toString(pState.getNextPlayer()) << endl;
+		//assert(pState.getMove().getType() != best_move.getMove().getType());
 
 		return best_move;
 	}

@@ -44,7 +44,7 @@ namespace TICTACTOE3D
 						alpha = best_next_state.value;
 					}
 
-					if (beta <= alpha ||  pDue - Deadline::now() < TIME_BUFFER)
+					if (beta <= alpha || pDue - Deadline::now() < TIME_BUFFER)
 						break;
 				}
 				return best_next_state;
@@ -100,9 +100,9 @@ namespace TICTACTOE3D
 			//////////////////////////////////////////////////////////////////////////
 			//2_pts
 			//////////////////////////////////////////////////////////////////////////
-			17, 18, 20, 23, 
+			17, 18, 20, 23,
 			24, 27, 29, 30,
-			33, 34, 36, 39, 
+			33, 34, 36, 39,
 			40, 43, 45, 46
 		};
 

@@ -204,7 +204,7 @@ void GameState::doMove(const Move &pMove)
 std::string GameState::toString(int pPlayer) const
 {
 	// Select preferred printing style by setting cell_text to SIMPLE_TEXT, UNICODE_TEXT or COLOR_TEXT
-	static const std::string *cell_text = COLOR_TEXT;
+	static const std::string *cell_text = SIMPLE_TEXT;
 	static const std::string board_top    = (cell_text == SIMPLE_TEXT) ? "     -----------------\n" : "    ╭─────────╮        ╭─────────╮        ╭─────────╮        ╭─────────╮\n";
 	static const std::string board_bottom = (cell_text == SIMPLE_TEXT) ? "     -----------------\n" : "    ╰─────────╯        ╰─────────╯        ╰─────────╯        ╰─────────╯\n";
 	static const std::string board_left   = (cell_text == SIMPLE_TEXT) ? "| " : "│ ";

@@ -40,9 +40,8 @@ int main(int argc, char **argv)
     std::string input_message;
     while (std::getline(std::cin, input_message))
     {
-		std::cerr << "startloop" << std::endl;
         // Get game state from standard input
-        std::cerr << "Receiving: '" << input_message << "'" << std::endl;
+        //std::cerr << "Receiving: '" << input_message << "'" << std::endl;
         TICTACTOE3D::GameState input_state(input_message);
 
 		//See if we would produce the same message
@@ -101,13 +100,11 @@ int main(int argc, char **argv)
 
         // Send the next move
         std::string output_message = output_state.toMessage();
-        std::cerr << "Sending: '" << output_message << "'"<< std::endl;
+        //std::cerr << "Sending: '" << output_message << "'"<< std::endl;
         std::cout << output_message << std::endl;
 
 		// Quit if this is end of game
         if (output_state.getMove().isEOG())
             break;
-
-		std::cerr << "end_loop" << std::endl;
     }
 }
