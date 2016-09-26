@@ -18,10 +18,8 @@ namespace TICTACTOE3D
 			}
 		} typedef GameStateEvaluation;
 
-		static const double TIME_BUFFER;
-		static const double PRELIM_TIME_BUFFER;
 	public:
-		static GameState get_best_next_state(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth);
+		static GameState get_best_next_state(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type);
 	private:
 		static MiniMax::GameStateEvaluation minimax(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth, int depth);
 		static GameStateEvaluation minimax_alpha_beta(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth, int depth, int alpha, int beta);
