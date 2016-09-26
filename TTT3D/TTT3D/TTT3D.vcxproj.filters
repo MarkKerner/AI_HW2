@@ -55,5 +55,8 @@
     <None Include="..\..\README_cpp">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\handwritten_heuristic.py">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

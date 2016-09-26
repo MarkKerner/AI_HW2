@@ -28,12 +28,12 @@ namespace TICTACTOE3D
 
 		if (depth == 0 && num_next_moves > 1)
 		{
-			prelim_sort(pDue, our_player_type, l_next_states);
+			//prelim_sort(pDue, our_player_type, l_next_states);
 		}
 
 		if (num_next_moves == 0 || depth >= max_depth || pDue - Deadline::now() < TIME_BUFFER)
 		{
-			return{ current_state, evaluate_gamestate_3d(current_state, our_player_type) };
+			return{ current_state, evaluate_gamestate_3d_2(current_state, our_player_type) };
 		}
 		else
 		{
@@ -44,7 +44,7 @@ namespace TICTACTOE3D
 				int iter = 0;
 				for (GameState next_state : l_next_states)
 				{
-					//cerr << "A:" << "iter:" << iter << ":of:" << num_next_moves << endl;
+					//cerr << "A:" << "iter:" << iter << ":of:" << num_next_moves << ":alpha:" << alpha << ":beta:" << beta << endl;
 					GameStateEvaluation next_state_eval = minimax_alpha_beta(pDue, next_state, our_player_type, max_depth, depth + 1, alpha, beta);
 					if (next_state_eval.value > best_next_state.value)
 					{
@@ -56,7 +56,8 @@ namespace TICTACTOE3D
 					}
 					if (alpha >= beta || pDue - Deadline::now() < TIME_BUFFER)
 					{
-						break;
+						//cerr << "pruned:" << "alpha:" << alpha << ":beta:" << beta << endl;
+						return best_next_state;
 					}
 					++iter;
 				}
@@ -65,10 +66,10 @@ namespace TICTACTOE3D
 			else //B
 			{
 				GameStateEvaluation best_next_state{ current_state, INT_MAX };
+				int iter = 0;
 				for (GameState next_state : l_next_states)
 				{
-					int iter = 0;
-					//cerr << "A:" << "iter:" << iter << ":of:" << num_next_moves << endl;
+					//cerr << "B:" << "iter:" << iter << ":of:" << num_next_moves << ":alpha:" << alpha << ":beta:" << beta << endl;
 					GameStateEvaluation next_state_eval = minimax_alpha_beta(pDue, next_state, our_player_type, max_depth, depth + 1, alpha, beta);
 					if (next_state_eval.value < best_next_state.value)
 					{
@@ -80,7 +81,8 @@ namespace TICTACTOE3D
 					}
 					if (beta <= alpha || pDue - Deadline::now() < TIME_BUFFER)
 					{
-						break;
+						//cerr << "pruned:" << "alpha:" << alpha << ":beta:" << beta << endl;
+						return best_next_state;
 					}
 					++iter;
 				}
@@ -190,7 +192,7 @@ namespace TICTACTOE3D
 
 		if (num_next_moves == 0 || depth >= max_depth || pDue - Deadline::now() < PRELIM_TIME_BUFFER)
 		{
-			return{ current_state, evaluate_gamestate_3d(current_state, our_player_type) };
+			return{ current_state, evaluate_gamestate_3d_2(current_state, our_player_type) };
 		}
 		else
 		{
@@ -224,6 +226,262 @@ namespace TICTACTOE3D
 				}
 				return best_next_state;
 			}
+		}
+	}
+	int MiniMax::evaluate_gamestate_3d_2(const GameState& game_state, const int our_player_type)
+	{
+		int win_lose_scalar = 10000;
+		if (game_state.isXWin())
+		{
+			if (our_player_type == CELL_X)
+				return win_lose_scalar;
+			else
+				return -win_lose_scalar;
+		}
+		else if (game_state.isOWin())
+		{
+			if (our_player_type == CELL_O)
+				return win_lose_scalar;
+			else return -win_lose_scalar;
+		}
+
+		int x_value = 0;
+		int o_value = 0;
+
+		int contains_x;
+		int contains_o;
+		//////////////////////////////////////////////////////////////////////////
+		//rows
+		//////////////////////////////////////////////////////////////////////////
+		for (int row = 0; row < game_state.cSquares; row += 4) //all rows
+		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int cell = row; cell < row + 4; ++cell)
+			{
+				const uint8_t& cell_value = game_state.at(cell);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//cols
+		//////////////////////////////////////////////////////////////////////////
+		for (int level = 0; level < game_state.cSquares; level += 16)
+		{
+			for (int col = level; col < 4; ++col) //all columns
+			{
+				contains_x = 0;
+				contains_o = 0;
+				for (int cell = col; cell < level + 16; cell += 4)
+				{
+					const uint8_t& cell_value = game_state.at(cell);
+					if (cell_value == CELL_X)
+						++contains_x;
+					else if (cell_value == CELL_O)
+						++contains_o;
+				}
+				if (contains_x && !contains_o)
+					x_value += contains_x;
+				else if (contains_o && !contains_x)
+					o_value += contains_o;
+			}
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//row diagonals top to bottom
+		//////////////////////////////////////////////////////////////////////////
+		for (int row = 0; row < 16; row += 4)
+		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int level = row; level < game_state.cSquares; level += 16 + 1)
+			{
+				const uint8_t& cell_value = game_state.at(level);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+
+		for (int row = 3; row < 16; row += 4)
+		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int level = row; level < game_state.cSquares - 3; level += 16 - 1)
+			{
+				const uint8_t& cell_value = game_state.at(level);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//col diagonals top to bottom
+		//////////////////////////////////////////////////////////////////////////
+		for (int col = 0; col < 4; ++col) //all columns
+		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int level = col; level < game_state.cSquares; level += 20)
+			{
+				const uint8_t& cell_value = game_state.at(level);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+		for (int col = 12; col < 16; ++col) //all columns
+		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int level = col; level < game_state.cSquares - 3; level += 12)
+			{
+				const uint8_t& cell_value = game_state.at(level);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//top_left-bottom_right diagonal
+		//////////////////////////////////////////////////////////////////////////
+		for (int layer = 0; layer < game_state.cSquares; layer += 16) {
+			contains_x = 0;
+			contains_o = 0;
+			for (int cell = 0; cell < layer + 16; cell += 5)
+			{
+				const uint8_t& cell_value = game_state.at(cell);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+		//////////////////////////////////////////////////////////////////////////
+		//top_right-bottom_left diagonal
+		//////////////////////////////////////////////////////////////////////////
+		for (int layer = 0; layer < game_state.cSquares; layer += 16) {
+			contains_x = 0;
+			contains_o = 0;
+			for (int cell = layer + 3; cell < layer + 16 - 3; cell += 3)
+			{
+				const uint8_t& cell_value = game_state.at(cell);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+		//////////////////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////////////////
+		//diagonal diagonal
+		//////////////////////////////////////////////////////////////////////////
+		contains_x = 0;
+		contains_o = 0;
+		for (int i = 0; i < game_state.cSquares; i += 21)
+		{
+			const uint8_t& cell_value = game_state.at(i);
+			if (cell_value == CELL_X)
+				++contains_x;
+			else if (cell_value == CELL_O)
+				++contains_o;
+		}
+		if (contains_x && !contains_o)
+			x_value += contains_x;
+		else if (contains_o && !contains_x)
+			o_value += contains_o;
+		//////////////////////////////////////////////////////////////////////////
+		contains_x = 0;
+		contains_o = 0;
+		for (int i = 3; i < game_state.cSquares; i += 19)
+		{
+			const uint8_t& cell_value = game_state.at(i);
+			if (cell_value == CELL_X)
+				++contains_x;
+			else if (cell_value == CELL_O)
+				++contains_o;
+		}
+		if (contains_x && !contains_o)
+			x_value += contains_x;
+		else if (contains_o && !contains_x)
+			o_value += contains_o;
+		//////////////////////////////////////////////////////////////////////////
+		contains_x = 0;
+		contains_o = 0;
+		for (int i = 12; i < game_state.cSquares; i += 13)
+		{
+			const uint8_t& cell_value = game_state.at(i);
+			if (cell_value == CELL_X)
+				++contains_x;
+			else if (cell_value == CELL_O)
+				++contains_o;
+		}
+		if (contains_x && !contains_o)
+			x_value += contains_x;
+		else if (contains_o && !contains_x)
+			o_value += contains_o;
+		//////////////////////////////////////////////////////////////////////////
+		contains_x = 0;
+		contains_o = 0;
+		for (int i = 15; i < game_state.cSquares - 49; i += 11)
+		{
+			const uint8_t& cell_value = game_state.at(i);
+			if (cell_value == CELL_X)
+				++contains_x;
+			else if (cell_value == CELL_O)
+				++contains_o;
+		}
+		if (contains_x && !contains_o)
+			x_value += contains_x;
+		else if (contains_o && !contains_x)
+			o_value += contains_o;
+
+
+
+		if (our_player_type == CELL_X)
+		{
+			return x_value - o_value;
+		}
+		else {
+			return o_value - x_value;
 		}
 	}
 }
