@@ -126,6 +126,7 @@
   <ItemGroup>
     <None Include="..\..\README_cpp" />
     <None Include="..\23-24_september.py" />
+    <None Include="..\handwritten_heuristic.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

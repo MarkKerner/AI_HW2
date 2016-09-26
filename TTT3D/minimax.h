@@ -22,6 +22,7 @@ namespace TICTACTOE3D
 		static GameState get_best_next_state(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type);
 	private:
 		static MiniMax::GameStateEvaluation minimax(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth, int depth);
+		static	int evaluate_gamestate_3d_2(const GameState& game_state, const int our_player_type);
 		static GameStateEvaluation minimax_alpha_beta(const Deadline &pDue, const GameState& current_state, uint8_t our_player_type, const int max_depth, int depth, int alpha, int beta);
 		static void prelim_sort(const Deadline &pDue, uint8_t our_player_type, vector<GameState>& moves);
 		static int evaluate_gamestate_3d(const GameState& game_state, const int our_player_type);
