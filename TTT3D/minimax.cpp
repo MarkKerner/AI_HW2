@@ -93,20 +93,26 @@ namespace TICTACTOE3D
 	int MiniMax::evaluate_gamestate_3d(const GameState& game_state, const int our_player_type)
 	{
 		int win_lose_scalar = 500;
-		if (game_state.isXWin())
-		{
-			if (our_player_type == CELL_X)
-				return win_lose_scalar;
-			else
-				return -win_lose_scalar;
-		}
-		else if (game_state.isOWin())
-		{
-			if (our_player_type == CELL_O)
-				return win_lose_scalar;
-			else
-				return -win_lose_scalar;
-		}
+        if (game_state.isEOG()){
+                if (game_state.isXWin())
+            {
+                if (our_player_type == CELL_X)
+                    return win_lose_scalar;
+                else
+                    return -win_lose_scalar;
+            }
+            else if (game_state.isOWin())
+            {
+                if (our_player_type == CELL_O)
+                    return win_lose_scalar;
+                else
+                    return -win_lose_scalar;
+            }
+            else if(game_state.isDraw())
+            {
+                return win_lose_scalar-300;
+            }
+        }
 
 		vector<int> p_values =
 		{
