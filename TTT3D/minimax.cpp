@@ -174,11 +174,6 @@ namespace TICTACTOE3D
 
 		sort(evals.begin(), evals.end());
 
-		if (evals.size() >= 32)
-		{
-			evals.resize(evals.size() / 4);
-		}
-
 		moves.clear();
 		for (GameStateEvaluation eval : evals) {
 			moves.push_back(eval.state);
