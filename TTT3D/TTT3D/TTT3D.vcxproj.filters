@@ -52,5 +52,8 @@
     <None Include="..\23-24_september.py">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\..\README_cpp">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
