@@ -228,26 +228,40 @@ namespace TICTACTOE3D
 			}
 		}
 	}
+
+	static void evaluate_row_points(const int& contains_x, const int& contains_o, int& x_value, int& o_value)
+	{
+		if (contains_x && !contains_o)
+			x_value += contains_x;
+		else if (contains_o && !contains_x)
+			o_value += contains_o;
+	}
+
 	int MiniMax::evaluate_gamestate_3d_2(const GameState& game_state, const int our_player_type)
 	{
-		int win_lose_scalar = 10000;
-		if (game_state.isXWin())
-		{
-			if (our_player_type == CELL_X)
-				return win_lose_scalar;
-			else
-				return -win_lose_scalar;
+		int win_lose_scalar = 500;
+		if (game_state.isEOG()) {
+			if (game_state.isXWin())
+			{
+				if (our_player_type == CELL_X)
+					return win_lose_scalar;
+				else
+					return -win_lose_scalar;
+			}
+			else if (game_state.isOWin())
+			{
+				if (our_player_type == CELL_O)
+					return win_lose_scalar;
+				else
+					return -win_lose_scalar;
+			}
+			else if (game_state.isDraw())
+			{
+				return win_lose_scalar - 400;
+			}
 		}
-		else if (game_state.isOWin())
-		{
-			if (our_player_type == CELL_O)
-				return win_lose_scalar;
-			else return -win_lose_scalar;
-		}
-
 
 		vector<int> buckets;
-
 
 		int x_value = 0;
 		int o_value = 0;
@@ -259,14 +273,11 @@ namespace TICTACTOE3D
 		//////////////////////////////////////////////////////////////////////////
 		for (int row = 0; row < game_state.cSquares; row += 4) //all rows
 		{
-
-
 			contains_x = 0;
 			contains_o = 0;
 
 			for (int cell = row; cell < row + 4; ++cell)
 			{
-
 				buckets.push_back(cell);
 
 				const uint8_t& cell_value = game_state.at(cell);
@@ -274,13 +285,8 @@ namespace TICTACTOE3D
 					++contains_x;
 				else if (cell_value == CELL_O)
 					++contains_o;
-
-
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 
 		/*
@@ -295,7 +301,7 @@ namespace TICTACTOE3D
 		//////////////////////////////////////////////////////////////////////////
 		for (int level = 0; level < game_state.cSquares; level += 16)
 		{
-			for (int col = level; col < 4; ++col) //all columns
+			for (int col = level; col < level + 4; ++col) //all columns
 			{
 				contains_x = 0;
 				contains_o = 0;
@@ -310,10 +316,7 @@ namespace TICTACTOE3D
 					else if (cell_value == CELL_O)
 						++contains_o;
 				}
-				if (contains_x && !contains_o)
-					x_value += contains_x;
-				else if (contains_o && !contains_x)
-					o_value += contains_o;
+				evaluate_row_points(contains_x, contains_o, x_value, o_value);
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -333,10 +336,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 
 		for (int row = 3; row < 16; row += 4)
@@ -352,10 +352,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//col diagonals top to bottom
@@ -374,10 +371,7 @@ namespace TICTACTOE3D
 					++contains_o;
 
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 		for (int col = 12; col < 16; ++col) //all columns
 		{
@@ -393,10 +387,7 @@ namespace TICTACTOE3D
 					++contains_o;
 
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -414,10 +405,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//top_right-bottom_left diagonal
@@ -434,10 +422,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			if (contains_x && !contains_o)
-				x_value += contains_x;
-			else if (contains_o && !contains_x)
-				o_value += contains_o;
+			evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		}
 		//////////////////////////////////////////////////////////////////////////
 
@@ -455,10 +440,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		if (contains_x && !contains_o)
-			x_value += contains_x;
-		else if (contains_o && !contains_x)
-			o_value += contains_o;
+		evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
@@ -471,10 +453,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		if (contains_x && !contains_o)
-			x_value += contains_x;
-		else if (contains_o && !contains_x)
-			o_value += contains_o;
+		evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
@@ -487,14 +466,11 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		if (contains_x && !contains_o)
-			x_value += contains_x;
-		else if (contains_o && !contains_x)
-			o_value += contains_o;
+		evaluate_row_points(contains_x, contains_o, x_value, o_value);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
-		for (int i = 15; i < game_state.cSquares - 49; i += 11)
+		for (int i = 15; i < 49; i += 11)
 		{
 			buckets.push_back(i);
 			const uint8_t& cell_value = game_state.at(i);
@@ -503,12 +479,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		if (contains_x && !contains_o)
-			x_value += contains_x;
-		else if (contains_o && !contains_x)
-			o_value += contains_o;
-
-
+		evaluate_row_points(contains_x, contains_o, x_value, o_value);
 
 		////////////////////////////////////////////////////////////////////////// 
 	    //top-down 
@@ -526,29 +497,25 @@ namespace TICTACTOE3D
 	          ++contains_x; 
 	        else if (cell_value == CELL_O) 
 	          ++contains_o; 
-	      } 
-	      if (contains_x && !contains_o) 
-	        x_value += contains_x; 
-	      else if (contains_o && !contains_x) 
-	        o_value += contains_o; 
-	    } 
-
-
-
-
-		int how_many_rows=0;
-		for (int i=0;i<buckets.size();++i){
-			if(i % 4 == 0){ 
+		  }
+		  evaluate_row_points(contains_x, contains_o, x_value, o_value);
+	    }
+		//////////////////////////////////////////////////////////////////////////
+		//testing
+		/*int how_many_rows = 0;
+		for (int i = 0; i < buckets.size(); ++i) {
+			if (i > 0 && i % 4 == 0) {
 				cerr << endl;
-				cerr << "\t\t +=" << buckets[i-1] - buckets[i-2];
+				cerr << "\t\t +=" << buckets[i - 1] - buckets[i - 2];
 				cerr << endl;
 				++how_many_rows;
 			}
 			cerr << " " << buckets[i];
-			
 		}
 		cerr << endl << "there are: " << how_many_rows << " rows..." << endl;
-		exit(0);
+		cerr << "x_value:" << x_value << ":o_value:" << o_value << endl;
+		exit(0);*/
+		//////////////////////////////////////////////////////////////////////////
 
 
 		if (our_player_type == CELL_X)
