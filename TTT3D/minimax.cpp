@@ -28,7 +28,7 @@ namespace TICTACTOE3D
 
 		if (depth == 0 && num_next_moves > 1)
 		{
-			//prelim_sort(pDue, our_player_type, l_next_states);
+			prelim_sort(pDue, our_player_type, l_next_states);
 		}
 
 		if (num_next_moves == 0 || depth >= max_depth || pDue - Deadline::now() < TIME_BUFFER)
@@ -230,19 +230,26 @@ namespace TICTACTOE3D
 	}
 	int MiniMax::evaluate_gamestate_3d_2(const GameState& game_state, const int our_player_type)
 	{
-		int win_lose_scalar = 10000;
-		if (game_state.isXWin())
-		{
-			if (our_player_type == CELL_X)
-				return win_lose_scalar;
-			else
-				return -win_lose_scalar;
-		}
-		else if (game_state.isOWin())
-		{
-			if (our_player_type == CELL_O)
-				return win_lose_scalar;
-			else return -win_lose_scalar;
+		int win_lose_scalar = 500;
+		if (game_state.isEOG()) {
+			if (game_state.isXWin())
+			{
+				if (our_player_type == CELL_X)
+					return win_lose_scalar;
+				else
+					return -win_lose_scalar;
+			}
+			else if (game_state.isOWin())
+			{
+				if (our_player_type == CELL_O)
+					return win_lose_scalar;
+				else
+					return -win_lose_scalar;
+			}
+			else if (game_state.isDraw())
+			{
+				return win_lose_scalar - 300;
+			}
 		}
 
 		int x_value = 0;
@@ -474,10 +481,29 @@ namespace TICTACTOE3D
 		else if (contains_o && !contains_x)
 			o_value += contains_o;
 
-
-
-		if (our_player_type == CELL_X)
+		//////////////////////////////////////////////////////////////////////////
+		//top-down
+		//////////////////////////////////////////////////////////////////////////
+		for (int i = 0; i < 16; ++i)
 		{
+			contains_x = 0;
+			contains_o = 0;
+			for (int j = i; j < game_state.cSquares; j += 16)
+			{
+				const uint8_t& cell_value = game_state.at(i);
+				if (cell_value == CELL_X)
+					++contains_x;
+				else if (cell_value == CELL_O)
+					++contains_o;
+			}
+			if (contains_x && !contains_o)
+				x_value += contains_x;
+			else if (contains_o && !contains_x)
+				o_value += contains_o;
+		}
+
+
+		if (our_player_type == CELL_X) {
 			return x_value - o_value;
 		}
 		else {
