@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cmath>
 
 
 namespace TICTACTOE3D
@@ -229,22 +230,29 @@ namespace TICTACTOE3D
 		}
 	}
 
-	static void evaluate_row_points(const int& contains_x, const int& contains_o, int& x_value, int& o_value)
+	static void evaluate_row_points(const int& contains_x, const int& contains_o, vector<int>& x_row_values, vector<int>& o_row_values)
 	{
-		if (contains_x && !contains_o)
-			x_value += contains_x * contains_x * contains_x;
-		else if (contains_o && !contains_x)
-			o_value += contains_o * contains_o * contains_o;
-		else if (contains_x && contains_o)
+		int x_value = 0;
+		int o_value = 0;
+
+		if (!contains_x && !contains_o)
 		{
-			int negative_scalar = 0;
-			x_value -= negative_scalar;
-			o_value -= negative_scalar;
+			x_value = 1;
+			o_value = 1;
 		}
+		else if (!contains_o)
+			x_value += pow(2, contains_x);
+		else if (!contains_x)
+			o_value += pow(2, contains_o);
+
+		x_row_values.push_back(x_value);
+		o_row_values.push_back(o_value);
 	}
 
 	int MiniMax::evaluate_gamestate_3d_2(const GameState& game_state, const int our_player_type)
 	{
+
+		//cerr << game_state.toString(our_player_type) << endl;
 		int win_lose_scalar = INT_MAX;
 		if (game_state.isEOG()) {
 			if (game_state.isXWin())
@@ -263,14 +271,14 @@ namespace TICTACTOE3D
 			}
 			else if (game_state.isDraw())
 			{
-				return 0;
+				return win_lose_scalar - 1000;
 			}
 		}
 
 		vector<int> buckets;
 
-		int x_value = 0;
-		int o_value = 0;
+		vector<int> x_row_values;
+		vector<int> o_row_values;
 
 		int contains_x;
 		int contains_o;
@@ -292,7 +300,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 
 		/*
@@ -322,7 +330,7 @@ namespace TICTACTOE3D
 					else if (cell_value == CELL_O)
 						++contains_o;
 				}
-				evaluate_row_points(contains_x, contains_o, x_value, o_value);
+				evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////
@@ -342,7 +350,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 
 		for (int row = 3; row < 16; row += 4)
@@ -358,7 +366,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//col diagonals top to bottom
@@ -377,7 +385,7 @@ namespace TICTACTOE3D
 					++contains_o;
 
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 		for (int col = 12; col < 16; ++col) //all columns
 		{
@@ -393,7 +401,7 @@ namespace TICTACTOE3D
 					++contains_o;
 
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -411,7 +419,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//top_right-bottom_left diagonal
@@ -428,7 +436,7 @@ namespace TICTACTOE3D
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
 		//////////////////////////////////////////////////////////////////////////
 
@@ -446,7 +454,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		evaluate_row_points(contains_x, contains_o, x_value, o_value);
+		evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
@@ -459,7 +467,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		evaluate_row_points(contains_x, contains_o, x_value, o_value);
+		evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
@@ -472,7 +480,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		evaluate_row_points(contains_x, contains_o, x_value, o_value);
+		evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		//////////////////////////////////////////////////////////////////////////
 		contains_x = 0;
 		contains_o = 0;
@@ -485,7 +493,7 @@ namespace TICTACTOE3D
 			else if (cell_value == CELL_O)
 				++contains_o;
 		}
-		evaluate_row_points(contains_x, contains_o, x_value, o_value);
+		evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 
 		////////////////////////////////////////////////////////////////////////// 
 		//top-down 
@@ -498,14 +506,37 @@ namespace TICTACTOE3D
 			{
 
 				buckets.push_back(j);
-				const uint8_t& cell_value = game_state.at(i);
+				const uint8_t& cell_value = game_state.at(j);
 				if (cell_value == CELL_X)
 					++contains_x;
 				else if (cell_value == CELL_O)
 					++contains_o;
 			}
-			evaluate_row_points(contains_x, contains_o, x_value, o_value);
+			evaluate_row_points(contains_x, contains_o, x_row_values, o_row_values);
 		}
+
+		int x_value = 0;
+		int o_value = 0;
+		for (int i = 0; i < x_row_values.size(); ++i)
+		{
+			x_value += x_row_values[i];
+			o_value += o_row_values[i];
+		}
+		if (our_player_type == CELL_X)
+		{
+			return x_value;
+		} 
+		else
+		{
+			return o_value;
+		}
+		/*cerr << x_row_values.size() << ":" << o_row_values.size() << endl;
+		for (int i = 0; i < x_row_values.size(); ++i)
+			cerr << x_row_values[i] << ":";
+		cerr << endl;
+		/*for (int i = 0; i < o_row_values.size(); ++i)
+			cerr << o_row_values[i] << ":";
+		cerr << endl;*/
 		//////////////////////////////////////////////////////////////////////////
 		//testing
 		/*int how_many_rows = 0;
@@ -520,16 +551,6 @@ namespace TICTACTOE3D
 		}
 		cerr << endl << "there are: " << how_many_rows << " rows..." << endl;
 		exit(0);*/
-		cerr << "x_value:" << x_value << ":o_value:" << o_value << endl;
 		//////////////////////////////////////////////////////////////////////////
-
-
-		if (our_player_type == CELL_X)
-		{
-			return x_value - o_value;
-		}
-		else {
-			return o_value - x_value;
-		}
 	}
 }
