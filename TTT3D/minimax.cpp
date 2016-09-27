@@ -29,7 +29,7 @@ namespace TICTACTOE3D
 
 		if (depth == 0 && num_next_moves > 1)
 		{
-			//prelim_sort(pDue, our_player_type, l_next_states);
+			prelim_sort(pDue, our_player_type, l_next_states);
 		}
 
 		if (num_next_moves == 0 || depth >= max_depth || pDue - Deadline::now() < TIME_BUFFER)
@@ -517,18 +517,37 @@ namespace TICTACTOE3D
 
 		int x_value = 0;
 		int o_value = 0;
+		int n_x_eight = 0;
+		int n_o_eight = 0;
+		int n_x_four = 0;
+		int n_o_four = 0;
 		for (int i = 0; i < x_row_values.size(); ++i)
 		{
-			x_value += x_row_values[i];
-			o_value += o_row_values[i];
+			int& x_value_in_row = x_row_values[i];
+			int& o_value_in_row = o_row_values[i];
+			if(x_value_in_row == 8)
+				++n_x_eight;
+			if(o_value_in_row == 8)
+				++n_o_eight;
+			if(x_value_in_row == 4)
+				++n_x_four;
+			if(o_value_in_row == 4)
+				++n_o_four;
+			x_value += x_value_in_row;
+			o_value += o_value_in_row;
 		}
+		if (n_x_eight > 1 && n_o_eight == 0)
+			x_value *= 2;
+		if (n_o_eight > 1 && n_x_eight == 0)
+			o_value *= 2;
+
 		if (our_player_type == CELL_X)
 		{
-			return x_value;
+			return x_value - o_value;
 		} 
 		else
 		{
-			return o_value;
+			return o_value - x_value;
 		}
 		/*cerr << x_row_values.size() << ":" << o_row_values.size() << endl;
 		for (int i = 0; i < x_row_values.size(); ++i)
