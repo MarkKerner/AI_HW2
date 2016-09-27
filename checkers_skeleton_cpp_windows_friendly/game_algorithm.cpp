@@ -1,5 +1,6 @@
 
 #include "game_algorithm.h"
+#include <float.h>
 
 static const double LOWER_TIME_LIMIT = 0.1;
 
@@ -10,7 +11,7 @@ static const double time_left(const Deadline& p_due)
 
 checkers::GameState GameAlgorithm::get_best_move(const Deadline& p_due, const GameState& p_starting_move)
 {
-	return nega_max(p_due, p_starting_move, p_starting_move.getNextPlayer(), 3, 1).state;
+	return nega_max(p_due, p_starting_move, p_starting_move.getNextPlayer(), 10, 1).state;
 }
 
 GameAlgorithm::GameStateEvaluation GameAlgorithm::nega_max(const Deadline& p_due, const GameState& p_state, uint8_t our_player_type, int depth, int color)
@@ -24,15 +25,17 @@ GameAlgorithm::GameStateEvaluation GameAlgorithm::nega_max(const Deadline& p_due
 		return GameStateEvaluation{ p_state, color * evaluate_state(p_state, our_player_type) };
 	}
 
-	GameStateEvaluation best_value{ 0, -DBL_MAX };
+	GameStateEvaluation best_value{ p_state, -FLT_MAX };
 
-	for (GameState next_state : next_states)
+	for (const GameState& next_state : next_states)
 	{
 		GameStateEvaluation v = nega_max(p_due, next_state, our_player_type, depth - 1, -color);
-		v.value = -v.value;
+		v.value = -v.value; //Multiply by -1 when back-propagating
+
 		if (v.value > best_value.value)
 		{
-			best_value = v;
+			best_value.state = next_state;
+			best_value.value = v.value;
 		}
 		if (time_left(p_due) < LOWER_TIME_LIMIT) {
 			break;
@@ -43,7 +46,7 @@ GameAlgorithm::GameStateEvaluation GameAlgorithm::nega_max(const Deadline& p_due
 
 float GameAlgorithm::evaluate_state(const GameState& p_state, const uint8_t our_player_type)
 {
-	float win_scalar = DBL_MAX;
+	float win_scalar = FLT_MAX;
 
 	if (p_state.isEOG())
 	{
@@ -63,7 +66,7 @@ float GameAlgorithm::evaluate_state(const GameState& p_state, const uint8_t our_
 		}
 		else if (p_state.isDraw())
 		{
-			return DBL_MAX / 2.0; //still a lot
+			return FLT_MAX / 2.0f; //still a lot
 		}
 	}
 

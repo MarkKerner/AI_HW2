@@ -1,6 +1,8 @@
 #include "player.hpp"
 #include <cstdlib>
 
+#include "game_algorithm.h"
+
 namespace checkers
 {
 
@@ -17,7 +19,7 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
      * Here you should write your clever algorithms to get the best next move, ie the best
      * next state. This skeleton returns a random move instead.
      */
-    return lNextStates[rand() % lNextStates.size()];
+    return GameAlgorithm::get_best_move(pDue, pState);
 }
 
 /*namespace checkers*/ }
