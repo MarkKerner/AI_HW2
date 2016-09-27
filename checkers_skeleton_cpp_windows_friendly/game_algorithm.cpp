@@ -2,6 +2,8 @@
 #include "game_algorithm.h"
 #include <float.h>
 
+static const int MAX_DEPTH = 10;
+
 static const double LOWER_TIME_LIMIT = 0.1;
 
 static const double time_left(const Deadline& p_due)
@@ -11,7 +13,7 @@ static const double time_left(const Deadline& p_due)
 
 checkers::GameState GameAlgorithm::get_best_move(const Deadline& p_due, const GameState& p_starting_move)
 {
-	return nega_max(p_due, p_starting_move, p_starting_move.getNextPlayer(), 5, 1, -FLT_MAX, FLT_MAX).state;
+	return nega_max(p_due, p_starting_move, p_starting_move.getNextPlayer(), MAX_DEPTH, 1, -FLT_MAX, FLT_MAX).state;
 }
 
 GameAlgorithm::GameStateEvaluation GameAlgorithm::nega_max(const Deadline& p_due, const GameState& p_state, uint8_t our_player_type, int depth, int color, float alpha, float beta)
@@ -22,7 +24,6 @@ GameAlgorithm::GameStateEvaluation GameAlgorithm::nega_max(const Deadline& p_due
 
 	if (depth == 0 || num_next_states == 0)
 	{
-		//cerr << (depth == 0) << ":" << (num_next_states == 0) << endl;
 		float state_evaluation = evaluate_state(p_state, our_player_type);
 		return GameStateEvaluation{ p_state, color * state_evaluation };
 	}
@@ -73,7 +74,7 @@ float GameAlgorithm::evaluate_state(const GameState& p_state, const uint8_t our_
 		}
 		else if (p_state.isDraw())
 		{
-			return FLT_MAX / 4.0f; 
+			return FLT_MAX / 4.0f;
 		}
 	}
 
@@ -84,9 +85,13 @@ float GameAlgorithm::evaluate_state(const GameState& p_state, const uint8_t our_
 	{
 		const uint8_t& cell_status = p_state.at(i);
 		if (cell_status&CELL_RED)
-			++red_count;
+		{
+			red_count += cell_status&CELL_KING ? 2 : 1;
+		}
 		else if (cell_status&CELL_WHITE)
-			++white_count;
+		{
+			++white_count += cell_status&CELL_KING ? 2 : 1;
+		}
 	}
 
 	if (our_player_type == CELL_RED)
